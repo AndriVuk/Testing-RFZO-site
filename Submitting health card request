@@ -1,0 +1,81 @@
+public class HomePageRfzoHelper extends BaseHelper
+{
+    @FindBy(id = "item-261")
+    WebElement insuredPersons;
+    WebDriver driver;
+
+    public HomePageRfzoHelper(WebDriver driver)
+    {
+        this.driver=driver;
+        PageFactory.initElements(driver, this);
+    }
+    private void goToRfzo()
+    {
+        driver.get("https://www.rfzo.rs/");
+    }
+    private void clickInsuredPersons()
+    {
+        wdWait.until(ExpectedConditions.presenceOfElementLocated(By.id("item-261")));
+        insuredPersons.click();
+    }
+    public void insured()
+    {
+        goToRfzo();
+        clickInsuredPersons();
+    }
+
+
+}
+public class InsuredPageRfzoHelper extends BaseHelper
+{
+    @FindBy(xpath = "//*[@id=\"accordion_menu_187\"]/li[4]/div[1]/div[2]/a")
+    WebElement healthCard;
+    WebDriver driver;
+
+    public InsuredPageRfzoHelper(WebDriver driver)
+    {
+        this.driver=driver;
+        PageFactory.initElements(driver, this);
+    }
+    private void insurance()
+    {
+        HomePageRfzoHelper rfzo = new HomePageRfzoHelper(driver);
+        rfzo.insured();
+    }
+    private void clickHealthCard()
+    {
+        healthCard.click();
+    }
+    private void goToMunicipal()
+    {
+        WebElement submissionRequest = driver.findElement(By.xpath("//*[@id=\"accordion_menu_187\"]/li[4]/div[2]/ul/li[2]/div[1]/div[2]/a"));
+        submissionRequest.click();
+        WebElement individuals = driver.findElement(By.xpath("//*[@id=\"sp-component\"]/article/section/p[7]/em/strong/span/strong"));
+        individuals.click();
+        wdWait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//*[@id=\"sp-component\"]/article/section/div[1]/div/p[12]/strong/a")));
+        WebElement here = driver.findElement(By.xpath("//*[@id=\"sp-component\"]/article/section/div[1]/div/p[12]/strong/a"));
+        js.executeScript("arguments[0].scrollIntoView()", here);
+        js.executeScript("arguments[0].click();",here);
+    }
+    
+    public void healthCardRequest()
+    {
+        insurance();
+        clickHealthCard();
+        goToMunicipal();
+    }
+}
+{
+    @Test
+    public void dataHealthCard() throws InterruptedException
+    {
+        InsuredPageRfzoHelper insured = new InsuredPageRfzoHelper(driver);
+        insured.healthCardRequest();
+        wdWait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//*[@id=\"sp-component\"]/article/section/table/tbody/tr[61]")));
+        WebElement municipalCode = driver.findElement(By.xpath("//*[@id=\"sp-component\"]/article/section/table/tbody/tr[61]"));
+        js.executeScript("arguments[0].scrollIntoView()", municipalCode);
+        Assert.assertTrue(municipalCode.getText().contains("Звездара 32-022"));
+        //Thread.sleep ostavljen da bi se video rezultat testa
+        Thread.sleep(5000);
+    }
+}
