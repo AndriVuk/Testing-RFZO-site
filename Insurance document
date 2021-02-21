@@ -1,3 +1,59 @@
+public class HomePageRfzoHelper extends BaseHelper
+{
+    @FindBy(id = "item-261")
+    WebElement insuredPersons;
+    WebDriver driver;
+
+    public HomePageRfzoHelper(WebDriver driver)
+    {
+        this.driver=driver;
+        PageFactory.initElements(driver, this);
+    }
+    private void goToRfzo()
+    {
+        driver.get("https://www.rfzo.rs/");
+    }
+    private void clickInsuredPersons()
+    {
+        wdWait.until(ExpectedConditions.presenceOfElementLocated(By.id("item-261")));
+        insuredPersons.click();
+    }
+    public void insured()
+    {
+        goToRfzo();
+        clickInsuredPersons();
+    }
+    public class InsuredPageRfzoHelper extends BaseHelper
+{
+    @FindBy(xpath = "//*[@id=\"accordion_menu_187\"]/li[17]/div/div[2]/a")
+    WebElement documentVerification;
+    WebDriver driver;
+
+    public InsuredPageRfzoHelper(WebDriver driver)
+    {
+        this.driver=driver;
+        PageFactory.initElements(driver, this);
+    }
+    private void insurance()
+    {
+        HomePageRfzoHelper rfzo = new HomePageRfzoHelper(driver);
+        rfzo.insured();
+    }
+   
+    private void clickDocumentVerification()
+    {
+        documentVerification.click();
+    }
+
+    public void methodVerification()
+    {
+        insurance();
+        clickDocumentVerification();
+    }
+
+}
+
+}
 public class DocVerifyPageRfzoHelper extends BaseHelper
 {   @FindBy(id = "zk")
     WebElement ziField;
