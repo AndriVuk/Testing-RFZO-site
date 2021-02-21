@@ -1,0 +1,72 @@
+public class DocVerifyPageRfzoHelper extends BaseHelper
+{   @FindBy(id = "zk")
+    WebElement ziField;
+    @FindBy(id = "lbo")
+    WebElement lboField;
+    @FindBy(id = "proveriDugme")
+    WebElement searchButton;
+    WebDriver driver;
+    public DocVerifyPageRfzoHelper(WebDriver driver)
+    {
+        this.driver=driver;
+        PageFactory.initElements(driver, this);
+    }
+    private void documentVerification()
+    {
+        InsuredPageRfzoHelper verificationMethod = new InsuredPageRfzoHelper(driver);
+        verificationMethod.methodVerification();
+    }
+
+    private void insertZi(String ziNumber)
+    {
+        wdWait.until(ExpectedConditions.presenceOfElementLocated(By.id("zk")));
+        ziField.sendKeys(ziNumber);
+    }
+    private void insertLbo(String lboNumber)
+    {
+        lboField.sendKeys(lboNumber);
+    }
+    private void clickSearch()
+    {
+        searchButton.click();
+    }
+    public void insuranceVerification()
+    {
+        documentVerification();
+        insertZi("*************");
+        insertLbo("*************");
+        clickSearch();
+    }
+    public void messageVerification()
+    {
+        documentVerification();
+        insertZi("asd!#$");
+        insertLbo("YXC$%&");
+        clickSearch();
+    }
+    public class VerifyInsuranceRfzoTest extends BaseTest
+{
+    @Test
+    public void verificationInsuranceDocumentTest()
+    {
+        DocVerifyPageRfzoHelper insuredCard = new DocVerifyPageRfzoHelper(driver);
+        insuredCard.insuranceVerification();
+        WebElement searchResult = driver.findElement(By.id("rezultatproveredoprinosa"));
+        js.executeScript("arguments[0].scrollIntoView()",searchResult);
+        //Inicijali i LBO uklonjeni zbog poverljivosti podataka
+        //Datum overe uklonjen zbog promenljivosti podataka
+        Assert.assertTrue(searchResult.getText().contains("Матична филијала: Београд.\n" +
+                "Ваша здравствена књижица је оверена до: dd.mm.yyyy."));
+
+    }
+    @Test
+    public void messageVerificationTest() throws InterruptedException
+    {
+        DocVerifyPageRfzoHelper insuredMessage = new DocVerifyPageRfzoHelper(driver);
+        insuredMessage.messageVerification();
+        WebElement searchResult = driver.findElement(By.id("rezultatproveredoprinosa"));
+        js.executeScript("arguments[0].scrollIntoView()",searchResult);
+        Assert.assertTrue(searchResult.getText().contains("Број здравствене картице и ЛБО морају да буду у нумеричком формату!"));
+        //Thread.sleep ostavljen da bi se video rezultat testa
+        Thread.sleep(5000);
+    }
