@@ -1,0 +1,79 @@
+public class HomePageRfzoHelper extends BaseHelper
+{
+    @FindBy(id = "item-261")
+    WebElement insuredPersons;
+    WebDriver driver;
+
+    public HomePageRfzoHelper(WebDriver driver)
+    {
+        this.driver=driver;
+        PageFactory.initElements(driver, this);
+    }
+    private void goToRfzo()
+    {
+        driver.get("https://www.rfzo.rs/");
+    }
+    private void clickInsuredPersons()
+    {
+        wdWait.until(ExpectedConditions.presenceOfElementLocated(By.id("item-261")));
+        insuredPersons.click();
+    }
+    public void insured()
+    {
+        goToRfzo();
+        clickInsuredPersons();
+    }
+
+}
+public class InsuredPageRfzoHelper extends BaseHelper
+{
+    @FindBy(xpath = "//*[@id=\"accordion_menu_187\"]/li[6]/div/div[2]/a")
+    WebElement refund;
+    WebDriver driver;
+
+    public InsuredPageRfzoHelper(WebDriver driver)
+    {
+        this.driver=driver;
+        PageFactory.initElements(driver, this);
+    }
+    private void insurance()
+    {
+        HomePageRfzoHelper rfzo = new HomePageRfzoHelper(driver);
+        rfzo.insured();
+    }
+    
+    private void clickRefund()
+    {
+        refund.click();
+
+    }
+
+    public void refundPage()
+    {
+        insurance();
+        clickRefund();
+    }
+
+}
+public class FormP3RfzoTest extends BaseTest
+{
+    @Test
+    public void pdfLinkForm()
+    {
+        InsuredPageRfzoHelper pdfForm = new InsuredPageRfzoHelper(driver);
+        pdfForm.refundPage();
+        wdWait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//*[@id=\"sp-component\"]/article/section/p[10]/a")));
+        WebElement pdf = driver.findElement(By.xpath("//*[@id=\"sp-component\"]/article/section/p[10]/a"));
+        String link = pdf.getAttribute("href");
+        pdf.click();
+        ArrayList<String> tabs2 = new ArrayList<String>(driver.getWindowHandles());
+        driver.switchTo().window(tabs2.get(1));
+        System.out.println(driver.getCurrentUrl());
+        Assert.assertEquals("PDF is not opened",link,driver.getCurrentUrl());
+        driver.close();
+        driver.switchTo().window(tabs2.get(0));
+
+    }
+
+}
+
