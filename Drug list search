@@ -1,0 +1,74 @@
+public class HomePageRfzoHelper extends BaseHelper
+{
+    @FindBy(id = "item-261")
+    WebElement insuredPersons;
+    WebDriver driver;
+
+    public HomePageRfzoHelper(WebDriver driver)
+    {
+        this.driver=driver;
+        PageFactory.initElements(driver, this);
+    }
+    private void goToRfzo()
+    {
+        driver.get("https://www.rfzo.rs/");
+    }
+    private void clickInsuredPersons()
+    {
+        wdWait.until(ExpectedConditions.presenceOfElementLocated(By.id("item-261")));
+        insuredPersons.click();
+    }
+    public void insured()
+    {
+        goToRfzo();
+        clickInsuredPersons();
+    }
+
+}
+public class InsuredPageRfzoHelper extends BaseHelper
+{
+    @FindBy(xpath = "//*[@id=\"accordion_menu_187\"]/li[7]/div[1]/div[2]/a")
+    WebElement medicine;
+    WebDriver driver;
+
+    public InsuredPageRfzoHelper(WebDriver driver)
+    {
+        this.driver=driver;
+        PageFactory.initElements(driver, this);
+    }
+    private void insurance()
+    {
+        HomePageRfzoHelper rfzo = new HomePageRfzoHelper(driver);
+        rfzo.insured();
+    }
+   
+    private void medicineList()
+    {
+        medicine.click();
+        wdWait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//*[@id=\"sp-component\"]/article/section/p[9]/a")));
+        WebElement searchList = driver.findElement(By.xpath("//*[@id=\"sp-component\"]/article/section/p[9]/a"));
+        js.executeScript("arguments[0].scrollIntoView()", searchList);
+        searchList.click();
+    }
+    
+    public void searchMedicineList()
+    {
+        insurance();
+        medicineList();
+    }
+   
+}
+public class SearchMedicineRfzoTest extends BaseTest
+{
+    @Test
+    public void drugListSearch()throws InterruptedException
+    {
+        SearchListPageHelper searchList = new SearchListPageHelper(driver);
+        searchList.SearchVaccineList();
+        WebElement searchResult = driver.findElement(By.id("tabelalekova_info"));
+        js.executeScript("arguments[0].scrollIntoView()", searchResult);
+        Assert.assertTrue(searchResult.getText().contains("Приказ 26 до 32 од укупно 32 резултата (филтрирано од укупно 2868 резултата)"));
+        //Thread.sleep ostavljen da bi se video rezultat testa
+        Thread.sleep(5000);
+    }
+}
